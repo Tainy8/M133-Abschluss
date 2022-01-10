@@ -1,0 +1,36 @@
+h1 {
+    text-align: center;
+    font-family:'Courier New';
+}
+ul {
+    text-align: center;
+    font-family:'Courier New'
+}
+div {
+    background-color: 009900;
+    margin: 2px;
+    font-family:'Courier New';
+    font-size: 25px;
+    text-align: center;
+}
+table {
+    border:1px solid black;
+    align-self: center;
+}
+.center {
+    margin-left: auto;
+    margin-right: auto;
+    font-family:'Courier New';
+}
+.button {
+        margin: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -ms-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+}
+form {
+    align-self: center;
+}
+
