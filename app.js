@@ -7,6 +7,8 @@ const express = require('express'),
 	passportLocalMongoose = require("passport-local-mongoose"),
 	User = require("./models/user");
 
+const { check, validationResult } = require('express-validator')
+
 require('dotenv/config');
 
 var fs = require('fs');
@@ -32,16 +34,17 @@ app.use(bodyParser.urlencoded(
 	{ extended: true }
 ))
 
-//app.use(bodyParser.urlencoded({ extended: false }))
+
 app.use(bodyParser.json())
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-//const { populate } = require('./models/user');
+
 
 // Schritt 5 - Set up multer um upload files zu speichern
 var multer = require('multer');
+const { checkPrime } = require('crypto');
 
 var storage = multer.diskStorage({
 	destination: (req, file, cb) => {
@@ -95,18 +98,27 @@ app.get("/register", (req, res) => {
 	res.render("register");
 });
 
-app.post("/register", (req, res) => {
+app.post("/register",
+	check("username").isLength({ min: 3 }),
+	check("password").isLength({ min: 8 }),
+	check("email").isEmail(),
 
-	User.register(new User({ username: req.body.username, email: req.body.email }), req.body.password, function (err, user) {
-		if (err) {
-			console.log(err);
-			res.render("register");
+
+	(req, res) => {
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			return res.status(400).json({ errors: errors.array() });
 		}
-		passport.authenticate("local")(req, res, function () {
-			res.redirect("/login");
+		User.register(new User({ username: req.body.username, email: req.body.email }), req.body.password, function (err, user) {
+			if (err) {
+				console.log(err);
+				res.render("register");
+			}
+			passport.authenticate("local")(req, res, function () {
+				res.redirect("/login");
+			})
 		})
 	})
-})
 
 app.get("/logout", (req, res) => {
 	req.logout();
