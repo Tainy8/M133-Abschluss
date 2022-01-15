@@ -2,10 +2,19 @@ h1 {
     text-align: center;
     font-family:'Courier New';
 }
+
 ul {
     text-align: center;
-    font-family:'Courier New'
+    font-family:'Courier New';
+    list-style-type: none;
 }
+
+.pwmin {
+    text-align: center;
+    font-family:'Courier New';
+    font-size: 6;
+}
+
 div {
     background-color: 009900;
     margin: 2px;

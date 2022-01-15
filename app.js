@@ -5,8 +5,8 @@ const express = require('express'),
 	bodyParser = require("body-parser"),
 	LocalStrategy = require("passport-local"),
 	passportLocalMongoose = require("passport-local-mongoose"),
-	User = require("./models/user");
-
+	User = require("./models/user"),
+	Leaderboard = require("./models/leaderboard");
 const { check, validationResult } = require('express-validator')
 
 require('dotenv/config');
@@ -41,22 +41,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-
-// Schritt 5 - Set up multer um upload files zu speichern
-var multer = require('multer');
-const { checkPrime } = require('crypto');
-
-var storage = multer.diskStorage({
-	destination: (req, file, cb) => {
-		cb(null, 'uploads')
-	},
-	filename: (req, file, cb) => {
-		cb(null, file.fieldname + '-' + Date.now())
-	}
-});
-
-var upload = multer({ storage: storage });
-
 //=======================
 //      R O U T E S
 //=======================
@@ -65,7 +49,13 @@ app.get("/", (req, res) => {
 })
 
 app.get("/main", (req, res) => {
-	res.render("main");
+	leaderboard.find({}, function (err, data) {
+		console.log(data);
+		res.render("main", {
+			leaderboards: data
+		});
+	})
+
 })
 
 
@@ -74,6 +64,7 @@ app.get('/', (req, res) => {
 		if (err) {
 			console.log(err);
 			res.status(500).send('An error occurred', err);
+			alert("There were some Errors.")
 		}
 		else {
 			res.render('uploadImages', { items: items });
@@ -98,16 +89,16 @@ app.get("/register", (req, res) => {
 	res.render("register");
 });
 
+//check if inputed values are ok
 app.post("/register",
 	check("username").isLength({ min: 3 }),
-	check("password").isLength({ min: 8 }),
+	check("username").isAlphanumeric(),
 	check("email").isEmail(),
-
-
+	check("password").isStrongPassword(),
 	(req, res) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
-			return res.status(400).json({ errors: errors.array() });
+			return res.status(400).json({ error: "The inputed values were Invalid. Pick valid inputs and try again." });
 		}
 		User.register(new User({ username: req.body.username, email: req.body.email }), req.body.password, function (err, user) {
 			if (err) {
@@ -120,11 +111,27 @@ app.post("/register",
 		})
 	})
 
+app.get("/create", (req, res) => {
+	res.render("create");
+});
+
 app.get("/logout", (req, res) => {
 	req.logout();
 	res.redirect("/");
 });
 
+app.post("/create", (req, res) => {
+	console.log(req.user.username);
+	const newLeaderboard = new Leaderboard({
+		creator: req.user.username,
+		title: req.body.title,
+		scores: []
+	});
+	newLeaderboard.save(function (err, doc) {
+		if (err) return console.error(err);
+		console.log("Created Leaderboard");
+	});
+})
 
 app.use(express.static(__dirname));
 
