@@ -49,8 +49,12 @@ app.get("/", (req, res) => {
 })
 
 app.get("/main", (req, res) => {
-	leaderboard.find({}, function (err, data) {
-		console.log(data);
+	const timeElapsed = Date.now();
+	const today = new Date(timeElapsed);
+	var logtxt = `------${today.toUTCString()}-----\n User ${req.user.username} logged in successfully.\n----------------------------------------\n\n`;
+	fs.appendFileSync('logs/log.txt', logtxt);
+
+	Leaderboard.find({ creator: req.user.username }, function (err, data) {
 		res.render("main", {
 			leaderboards: data
 		});
@@ -58,21 +62,37 @@ app.get("/main", (req, res) => {
 
 })
 
-
-app.get('/', (req, res) => {
-	imgModel.find({}, (err, items) => {
+app.post("/addScore", (req, res) => {
+	Leaderboard.findOne({ _id: req.body._id }, function (err, data) {
 		if (err) {
 			console.log(err);
-			res.status(500).send('An error occurred', err);
-			alert("There were some Errors.")
 		}
-		else {
-			res.render('uploadImages', { items: items });
+		let newUsername = req.body.username;
+		let newScore = req.body.score;
+		let scoreArray = [{}];
+		for (const score of data.scores) {
+			scoreArray.push({ username: score.username, score: score.score });
 		}
+
+		scoreArray.push({ username: newUsername, score: newScore });
+		scoreArray.shift();
+		Leaderboard.findOneAndUpdate({ _id: req.body._id }, { scores: scoreArray }, function (error) {
+			if (error) {
+				console.log(error);
+			}
+		});
+		res.redirect("main");
 	});
+
 });
 
-
+app.get("/leaderboard/:_id", (req, res) => {
+	Leaderboard.findOne({ _id: req.params._id }, function (err, data) {
+		res.render("leaderboard", {
+			leaderboard: data
+		});
+	})
+});
 //Auth Routes
 app.get("/login", (req, res) => {
 	res.render("login");
@@ -92,7 +112,6 @@ app.get("/register", (req, res) => {
 //check if inputed values are ok
 app.post("/register",
 	check("username").isLength({ min: 3 }),
-	check("username").isAlphanumeric(),
 	check("email").isEmail(),
 	check("password").isStrongPassword(),
 	(req, res) => {
@@ -121,16 +140,18 @@ app.get("/logout", (req, res) => {
 });
 
 app.post("/create", (req, res) => {
-	console.log(req.user.username);
-	const newLeaderboard = new Leaderboard({
+
+	let newLeaderboard = new Leaderboard({
 		creator: req.user.username,
 		title: req.body.title,
+		unit: req.body.unit,
 		scores: []
 	});
 	newLeaderboard.save(function (err, doc) {
 		if (err) return console.error(err);
 		console.log("Created Leaderboard");
 	});
+	res.redirect("main");
 })
 
 app.use(express.static(__dirname));

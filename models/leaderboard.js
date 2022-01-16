@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 const passportLocalMongoose = require("passport-local-mongoose");
 
 const LeaderBoardSchema = new mongoose.Schema({
-    creator: String,
     title: String,
+    creator: String,
     unit: String,
-    scores: [{ username: String, score: Number }]
+    scores: [{ index: false, username: String, score: Number }]
 });
 LeaderBoardSchema.plugin(passportLocalMongoose);
 

@@ -10,11 +10,18 @@
 </head>
 
 <body>
+    <h1>Your Leaderboards</h1>
     <% leaderboards.forEach(function (leaderboards) { %>
-        <%= leaderboards.title %>
-            <!-- note you defined the field as Name not name -->
-            <% }) %>
-                <a href="/create">Add Leaderboard</a>
+
+        <a type="button" href="/leaderboard/<%= leaderboards._id %>" id="button" for="button" name="button">
+            <%= leaderboards.title %>
+        </a>
+
+
+        <!-- note you defined the field as Name not name -->
+        <% }) %>
+            <a href="/create">Add Leaderboard</a>
+            <a href="/logout">Log out</a>
 </body>
 
 </html>
