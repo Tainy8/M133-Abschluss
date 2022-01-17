@@ -1,0 +1,45 @@
+*{
+    font-family: 'Courier New';
+    text-align: center;
+}
+body{
+    background-image: url("/images/background.png");
+}
+
+table {
+    border: 1px solid black;
+    margin: 0, auto;
+    margin-bottom: 10px;
+
+}
+
+.addButton{
+    width: 80px;
+    margin-bottom: 30px;
+}
+
+.delete{
+    font-size: 20px;
+    border: 1px solid black;
+    color: red;
+    background-color: whitesmoke;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#inputs{
+    margin-left: 40%;
+}
+
+form{
+    align-items: center;
+}
+
+.leaderboardTable {
+  border: 1px solid black;
+  border-collapse: collapse;
+  font-size: 20px;
+  margin: 0 auto;
+  margin-bottom: 40px;
+  font-weight: bold;
+}

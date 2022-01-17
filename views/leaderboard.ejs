@@ -5,37 +5,50 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/leaderboard.css">
+
     <title>Leaderboard</title>
 </head>
 
 <body>
-    <table>
-        <tr>
-            <th>Username</th>
-            <th>Score</th>
-            <th>Unit</th>
+    <h1>
+        <%= leaderboard.title%>
+    </h1>
+    <table class="leaderboardTable">
+        <tr class="leaderboardTable">
+            <th class="leaderboardTable">Rank</th>
+            <th class="leaderboardTable">Username</th>
+            <th class="leaderboardTable">Score</th>
+            <th class="leaderboardTable">Unit</th>
         </tr>
-        <% leaderboard.scores.forEach(function (score) { %>
-            <tr>
-                <td>
-                    <%= score.username %>
-                </td>
-                <td>
-                    <%= score.score %>
-                </td>
-                <td>
-                    <%= leaderboard.unit%>
-                </td>
-            </tr>
-            <% }) %>
+        <% leaderboard.scores.sort((a, b)=> a.score - b.score) %>
+            <% let rank=1;%>
+                <% leaderboard.scores.forEach(function (score) { %>
+                    <tr class="leaderboardTable">
+                        <td class="leaderboardTable">
+                            <%= rank %>.
+                        </td>
+                        <td class="leaderboardTable">
+                            <%= score.username %>
+                        </td>
+                        <td class="leaderboardTable">
+                            <%= score.score %>
+                        </td>
+                        <td class="leaderboardTable">
+                            <%= leaderboard.unit%>
+                        </td>
+                    </tr>
+                    <% rank++; %>
+                        <% }) %>
     </table>
     <form action="/addScore" method="POST">
-        <table class="center">
+        <h2>Add a Score</h2>
+        <table id="inputs">
             <textarea name="_id" style="display: none;"><%= leaderboard._id %></textarea>
 
             <tr>
                 <td><label for="username">UserName</label></td>
-                <td><input type="text" placeholder="username" id="username" name="username"></td>
+                <td><input type="text" id="username" name="username"></td>
             </tr>
             <tr>
                 <td><label for="score">Score</label></td>
@@ -43,9 +56,19 @@
             </tr>
         </table>
         <div class="submit">
-            <button>Add</button>
+            <button class="addButton">Add</button>
         </div>
     </form>
+    <div>
+        <a class="delete" type="button" href="/deleteLeaderBoard/<%= leaderboard._id %>">Delete this Leaderboard</a>
+    </div>
+
+    <div>
+        <ul>
+            <li><a href="/main">Home</a></li>
+            <li><a href="/logout">Log Out</a></li>
+        </ul>
+    </div>
 </body>
 
 </html>

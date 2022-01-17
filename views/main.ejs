@@ -11,17 +11,29 @@
 
 <body>
     <h1>Your Leaderboards</h1>
-    <% leaderboards.forEach(function (leaderboards) { %>
-
-        <a type="button" href="/leaderboard/<%= leaderboards._id %>" id="button" for="button" name="button">
-            <%= leaderboards.title %>
-        </a>
-
-
-        <!-- note you defined the field as Name not name -->
-        <% }) %>
-            <a href="/create">Add Leaderboard</a>
-            <a href="/logout">Log out</a>
+    <ul>
+        <% leaderboards.forEach(function (leaderboards) { %>
+            <li>
+                <a class="leaderboardButton" href="/leaderboard/<%= leaderboards._id %>" id="button" for="button"
+                    name="button">
+                    <%= leaderboards.title %>
+                </a>
+            </li>
+            <!-- note you defined the field as Name not name -->
+            <% }) %>
+                <li> <a class=leaderboardButton href="/create">Add Leaderboard</a></li>
+    </ul>
+    <div>
+        <form action="/filter" method="post">
+            <label for="title">Filter by Title</label>
+            <input type="text" id="title" name="title">
+            <button>Filter</button>
+        </form>
+        <ul>
+            <li><a href="/main">Remove Filter</a></li>
+            <li><a href="/logout">Log out</a></li>
+        </ul>
+    </div>
 </body>
 
 </html>

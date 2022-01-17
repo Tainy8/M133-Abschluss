@@ -3,10 +3,16 @@ h1 {
     font-family:'Courier New';
 }
 
+
 ul {
     text-align: center;
     font-family:'Courier New';
     list-style-type: none;
+}
+
+body{
+    background-image: url("/images/background.png");
+    background-size: cover;
 }
 
 .pwmin {

@@ -12,9 +12,11 @@
 <body>
     <form action="/create" method="POST">
         <table class="center">
+            <h1>Create a new Leaderboard</h1>
             <tr>
                 <td><label for="title">Title</label></td>
                 <td><input type="text" id="title" name="title"></td>
+            </tr>
             <tr>
                 <td><label for="unit">Unit</label></td>
                 <td><input type="text" id="unit" name="unit"></td>
@@ -23,9 +25,14 @@
 
         </table>
         <div class="submit">
-            <button>Submit</button>
+            <button>Add</button>
         </div>
     </form>
+    <div>
+        <ul>
+            <li><a href="/main">Back</a></li>
+        </ul>
+    </div>
 </body>
 
 </html>

@@ -40,7 +40,16 @@ app.use(bodyParser.json())
 app.use(passport.initialize());
 app.use(passport.session());
 
+//=======================
+//  F U N C T I O N S
+//=======================
+function writeToLog(txt, usr) {
+	const timeElapsed = Date.now();
+	const today = new Date(timeElapsed);
+	var logtxt = `------${today.toUTCString()}-----\n User ${usr} logged ${txt} successfully.\n----------------------------------------\n\n`;
 
+	fs.appendFileSync('logs/log.txt', logtxt);
+}
 //=======================
 //      R O U T E S
 //=======================
@@ -49,10 +58,7 @@ app.get("/", (req, res) => {
 })
 
 app.get("/main", (req, res) => {
-	const timeElapsed = Date.now();
-	const today = new Date(timeElapsed);
-	var logtxt = `------${today.toUTCString()}-----\n User ${req.user.username} logged in successfully.\n----------------------------------------\n\n`;
-	fs.appendFileSync('logs/log.txt', logtxt);
+	writeToLog("in", req.user.username);
 
 	Leaderboard.find({ creator: req.user.username }, function (err, data) {
 		res.render("main", {
@@ -86,12 +92,28 @@ app.post("/addScore", (req, res) => {
 
 });
 
+app.get("/deleteLeaderboard/:_id", (req, res) => {
+	Leaderboard.findOneAndDelete({ _id: req.params._id }, function (err, data) {
+		res.redirect("/main");
+	});
+});
+
+app.post("/filter", (req, res) => {
+
+	Leaderboard.find({ creator: req.user.username, title: { $regex: req.body.title } }, function (err, data) {
+		res.render("main", {
+			leaderboards: data
+		});
+	})
+
+})
+
 app.get("/leaderboard/:_id", (req, res) => {
 	Leaderboard.findOne({ _id: req.params._id }, function (err, data) {
 		res.render("leaderboard", {
 			leaderboard: data
 		});
-	})
+	});
 });
 //Auth Routes
 app.get("/login", (req, res) => {
@@ -135,6 +157,7 @@ app.get("/create", (req, res) => {
 });
 
 app.get("/logout", (req, res) => {
+	writeToLog("out", req.user.username);
 	req.logout();
 	res.redirect("/");
 });
