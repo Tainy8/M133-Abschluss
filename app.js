@@ -139,7 +139,7 @@ app.post("/register",
 	(req, res) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
-			return res.status(400).json({ error: "The inputed values were Invalid. Pick valid inputs and try again." });
+			return res.status(400).json({ error: "The inputed values were Invalid. Pick a valid E-Mail and watch out for the password minimum conditions." });
 		}
 		User.register(new User({ username: req.body.username, email: req.body.email }), req.body.password, function (err, user) {
 			if (err) {
