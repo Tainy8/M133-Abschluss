@@ -43,6 +43,8 @@ app.use(passport.session());
 //=======================
 //  F U N C T I O N S
 //=======================
+
+//function to writ in logfile
 function writeToLog(txt, usr) {
 	const timeElapsed = Date.now();
 	const today = new Date(timeElapsed);
@@ -52,6 +54,7 @@ function writeToLog(txt, usr) {
 }
 //=======================
 //      R O U T E S
+//   Here are the routes to the diffrent views
 //=======================
 app.get("/", (req, res) => {
 	res.render("home");
@@ -60,6 +63,7 @@ app.get("/", (req, res) => {
 app.get("/main", (req, res) => {
 	writeToLog("in", req.user.username);
 
+	//find the leaderboards of the current user
 	Leaderboard.find({ creator: req.user.username }, function (err, data) {
 		res.render("main", {
 			leaderboards: data
@@ -69,6 +73,8 @@ app.get("/main", (req, res) => {
 })
 
 app.post("/addScore", (req, res) => {
+
+	//add the new score to the current leaderboard
 	Leaderboard.findOne({ _id: req.body._id }, function (err, data) {
 		if (err) {
 			console.log(err);
@@ -92,14 +98,15 @@ app.post("/addScore", (req, res) => {
 
 });
 
+//deletes current leaderboard
 app.get("/deleteLeaderboard/:_id", (req, res) => {
 	Leaderboard.findOneAndDelete({ _id: req.params._id }, function (err, data) {
 		res.redirect("/main");
 	});
 });
 
+//applys the filter that was inputted
 app.post("/filter", (req, res) => {
-
 	Leaderboard.find({ creator: req.user.username, title: { $regex: req.body.title } }, function (err, data) {
 		res.render("main", {
 			leaderboards: data
@@ -108,6 +115,7 @@ app.post("/filter", (req, res) => {
 
 })
 
+//get the selected leaderboard
 app.get("/leaderboard/:_id", (req, res) => {
 	Leaderboard.findOne({ _id: req.params._id }, function (err, data) {
 		res.render("leaderboard", {
@@ -115,6 +123,35 @@ app.get("/leaderboard/:_id", (req, res) => {
 		});
 	});
 });
+
+app.get("/create", (req, res) => {
+	res.render("create");
+});
+
+//funtion to log out
+app.get("/logout", (req, res) => {
+	writeToLog("out", req.user.username);
+	req.logout();
+	res.redirect("/");
+});
+
+//create a new leaderboard in the db
+app.post("/create", (req, res) => {
+
+	let newLeaderboard = new Leaderboard({
+		creator: req.user.username,
+		title: req.body.title,
+		unit: req.body.unit,
+		scores: []
+	});
+	newLeaderboard.save(function (err, doc) {
+		if (err) return console.error(err);
+		console.log("Created Leaderboard");
+	});
+	res.redirect("main");
+})
+
+
 //Auth Routes
 app.get("/login", (req, res) => {
 	res.render("login");
@@ -131,7 +168,7 @@ app.get("/register", (req, res) => {
 	res.render("register");
 });
 
-//check if inputed values are ok
+//check if inputed values are ok and if yes create user in db
 app.post("/register",
 	check("username").isLength({ min: 3 }),
 	check("email").isEmail(),
@@ -152,30 +189,8 @@ app.post("/register",
 		})
 	})
 
-app.get("/create", (req, res) => {
-	res.render("create");
-});
 
-app.get("/logout", (req, res) => {
-	writeToLog("out", req.user.username);
-	req.logout();
-	res.redirect("/");
-});
 
-app.post("/create", (req, res) => {
-
-	let newLeaderboard = new Leaderboard({
-		creator: req.user.username,
-		title: req.body.title,
-		unit: req.body.unit,
-		scores: []
-	});
-	newLeaderboard.save(function (err, doc) {
-		if (err) return console.error(err);
-		console.log("Created Leaderboard");
-	});
-	res.redirect("main");
-})
 
 app.use(express.static(__dirname));
 
